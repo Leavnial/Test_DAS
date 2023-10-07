@@ -1,160 +1,84 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import random
+import telebot
+from telebot import types
 
-# C extensions
-*.so
+bot = telebot.TeleBot('token')
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+@bot.message_handler(commands=['start'])
+def test_psi(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton(text='Пройти тест',
+                                          url='https://www.idrlabs.com/ru/anxiety-stress-depression/test.php'))
+    bot.send_message(message.chat.id,
+                     "Здравствуйте! Я бот, который пришлет тест по оценке уровня депрессии, тревожности и стресса.\nТакже я вышлю вам полезные ссылки, после того, как вы напишите мне, какой из показателей у вас повышен.\nИтак, начнем тестирование:",
+                     reply_markup=markup)
+    bot.send_message(message.chat.id,
+                     "Когда вы закончите, напишите показатель, который у вас выше среднего показателя: *стресс*, *тревожность* или *депрессия*.",
+                     parse_mode='Markdown')
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+@bot.message_handler(func=lambda message: True)
+def handle_test_result(message):
+    result = message.text.lower()
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+    if result not in ["стресс", "тревожность", "депрессия"]:
+        bot.reply_to(message,
+                     "Пожалуйста, напишите один из вариантов вашего повышенного показателя: *стресс*, *тревожность* или *депрессия*.",
+                     parse_mode='Markdown')
+        return
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+    polza_statei(result, message)
+    polza_yutbe(result, message)
 
-# Translations
-*.mo
-*.pot
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+def polza_statei(result, message):
+    if result == "стресс":
+        articles = [
+            "https://www.b17.ru/article/464117/",
+            "https://www.b17.ru/article/464386/",
+            "https://www.b17.ru/article/464310/"
+        ]
+    elif result == "тревожность":
+        articles = [
+            "https://www.b17.ru/article/kak_spravitsya_s_trevojnimi_mislyami/",
+            "https://www.b17.ru/article/kak_izbavitsya_ot_trevogi_7sekretnih/",
+            "https://www.b17.ru/blog/chto_pochitat_pro_trevogu/"
+        ]
+    elif result == "депрессия":
+        articles = [
+            "https://www.b17.ru/blog/chto_takoe_depressiya/",
+            "https://www.b17.ru/article/povedencheskaya-aktivatsii-eksperiment/",
+            "https://www.b17.ru/article/depressiya-eto-bolezn/"
+        ]
 
-# Flask stuff:
-instance/
-.webassets-cache
+    if articles:
+        bot.send_message(message.chat.id, "Вот статья по результатам теста:")
+        article = random.choice(articles)
+        bot.send_message(message.chat.id, article)
 
-# Scrapy stuff:
-.scrapy
+def polza_yutbe(result, message):
+    if result == "стресс":
+        playlists = [
+            "https://www.youtube.com/watch?v=Lcd-rCktwDg&list=PLPNzHQ3dbnnrqGgcKQqG-5Gtl-XqNASHv",
+            "https://www.youtube.com/watch?v=8Tv3flM-xvY&list=PLv_BjIKGm-UYg22rthQiMQT8mWblEPYxI",
+            "https://www.youtube.com/watch?v=j8bl81VVkxM&list=PLjRF0k-aUGD84s24jkHiBgitxCnNvfE8U"
+        ]
+    elif result == "тревожность":
+        playlists = [
+            "https://www.youtube.com/watch?v=1pMRpjC_lKg&list=PLwcFyFHL0afOg78eYfZeiLlxMKVKLg6BJ&pp=iAQB",
+            "https://www.youtube.com/watch?v=-IAzSKYl6gk&list=PLosMrMnggLq97lZq7nWFQ7BilqcIcrip_",
+            "https://www.youtube.com/watch?v=CRmYQhWvkGc&list=PLgSBXyruqjResprL3Q9I27ETas6XD_FZQ"
+        ]
+    elif result == "депрессия":
+        playlists = [
+            "https://www.youtube.com/watch?v=OtEFE0BSyfI&list=PLbXhsRoASq9i3IT1dSKWcGHlL4cDNOsQB",
+            "https://www.youtube.com/watch?v=YaUkBmooefU&list=PLf7WRSHYASzQ2HGhT4OkLvwM_dANPmhkt",
+            "https://www.youtube.com/watch?v=vcsmn4mtinw&list=PL7p2qY-vNoqbdRGuqAbJap7nX79_jxFUI"
+        ]
 
-# Sphinx documentation
-docs/_build/
+    if playlists:
+        bot.send_message(message.chat.id, "Вот видео по результатам теста:")
+        playlist = random.choice(playlists)
+        bot.send_message(message.chat.id, playlist)
 
-# PyBuilder
-.pybuilder/
-target/
 
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/#use-with-ide
-.pdm.toml
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+bot.infinity_polling()
